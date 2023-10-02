@@ -1,0 +1,11 @@
+.pio
+.vscode
+
+tests/bin
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
+
+include/README
+lib/README
