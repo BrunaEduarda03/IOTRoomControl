@@ -13,7 +13,7 @@
 #ifndef COMPILE_OPTION
 // Caso não tenha especificado este MACRO no compilador,
 // Altere aqui para escolher a opção de compilação
-#   define COMPILE_OPTION 1
+#   define COMPILE_OPTION 3
 #endif
 
 #if COMPILE_OPTION == 1
@@ -23,3 +23,5 @@
 #else
 #   define COMPILE_TEST // compila teste do seu módulo
 #endif
+
+#define VOLTAGE 220.0   // tensão rms da rede
