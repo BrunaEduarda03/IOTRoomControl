@@ -12,7 +12,6 @@
 
 #include <Arduino.h>
 #include <macros.h>
-#include <hello_world.h>
 
 // para compilar o demo, modifique o MACRO no include/macros.h
 
