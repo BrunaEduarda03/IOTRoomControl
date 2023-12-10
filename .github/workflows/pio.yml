@@ -20,7 +20,14 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO Project
+      - name: Compila os módulos
         run: |
-          cd modules/monitorarConsumo
-          pio run
+          for module in modules/*; do
+          if [ -d "$module" ]; then
+            echo "Compilando o módulo: $module"
+            cd "$module"
+            pio run
+
+          fi
+          done
+          
