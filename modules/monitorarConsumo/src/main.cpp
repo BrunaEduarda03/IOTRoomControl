@@ -1,17 +1,23 @@
+
 /**
- * @file mod_test.h
+ * @file main.h
  * @author William Henrique A. Martins (william.martins@ee.ufcg.edu.br)
- *         <adicionar aqui>
- * @brief
+ * @brief 
  * @version 0.1
  * @date 2023-10-02
  * 
  * @copyright Copyright (c) 2023
  * 
-**/
+ */
+
+#include <Arduino.h>
+#include <macros.h>
+#include <hello_world.h>
+
+// para compilar o demo, modifique o MACRO no include/macros.h
 
 #include <macros.h>
-#ifdef COMPILE_TEST
+#ifdef COMPILE_MAIN
 
 #include <Arduino.h>
 
@@ -27,7 +33,7 @@
 #define SDA 21
 #define SCL 22
 SSD1306Wire display(0x3c, SDA, SCL);
-static PubSubClient *mqqt_client = NULL;
+static PubSubClient *mqqt_client;
 
 #define ADC_WIDTH 12                
 #define ADC_COUNT (1<<ADC_WIDTH)    
@@ -44,8 +50,8 @@ static PubSubClient *mqqt_client = NULL;
 
 void sct_read_rms(void* param) {
 
+  // configuração do ADC
   analogSetWidth(ADC_WIDTH);
-  
   analogSetAttenuation(ADC_11db);
 
   int g_pin = SCT_PIN;
@@ -112,17 +118,21 @@ void sct_read_rms(void* param) {
 
 void setup() {
   
-  Serial.begin(115200);
-  Serial.println("Sampling interval: " + String(SCT_MS_DELAY));
-  Serial.println("ADC Count: " + String(ADC_COUNT));
+  DEBUG_ONLY( Serial.begin(115200) );
+  DEBUG_ONLY( Serial.println("Sampling interval: " + String(SCT_MS_DELAY)) );
+  DEBUG_ONLY( Serial.println("ADC Count: " + String(ADC_COUNT)) );
 
-  // if(!wifi_init()) {
-  //   Serial.println("WiFi not connected");
-  // } else if(!mqqt_init()) {
-  //   Serial.println("MQQT not connected");
-  // }
-  // mqqt_client = mqqt();
-
+  // Inicializa o WiFi e o MQQT
+  if(!wifi_init()) {
+    Serial.println("WiFi not connected");
+  } else { 
+    if(!mqqt_init()) {
+      Serial.println("MQQT not connected");
+      mqqt_client = NULL;
+    } else                  // MQQT inicializado
+      mqqt_client = mqqt(); // recupera o endereço do cliente MQQT
+  }
+  
   display.init();
   display.setContrast(255);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
@@ -138,20 +148,19 @@ void setup() {
 
 void loop() {
   
-  // if(!mqqt_client->connected()) {
-  //   Serial.println("Erro: MQQT not connected");
-  //   mqqt_client->connect("LIEC_Dev01");
-  //   vTaskDelay(100 / portTICK_PERIOD_MS);
-  // }
+  if(!mqqt_client->connected()) {
+    DEBUG_ONLY( Serial.println("Erro: MQQT not connected") );
+    mqqt_client->connect("LIEC_Dev01");
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+  }
 
-  // mqqt_client->loop();
+  mqqt_client->loop();
 
-  // int analog = analogRead(SCT_PIN);
-  // Serial.println("ADC value: " + String(ADC_CALC(analog)) + " | " + String(analog) );
-  // vTaskDelay(1900 / portTICK_PERIOD_MS);
-  // put your main code here, to run repeatedly:
+  int analog = analogRead(SCT_PIN);
+  Serial.println("ADC value: " + String(ADC_CALC(analog)) + " | " + String(analog) );
+  vTaskDelay(1900 / portTICK_PERIOD_MS);
   
   vTaskDelay(100 / portTICK_PERIOD_MS);
 }
 
-#endif // !COMPILE_TEST
+#endif
